@@ -21,38 +21,46 @@ class BothDirectionTestRoute extends StatefulWidget {
 }
 
 class _BothDirectionTestRouteState extends State<BothDirectionTestRoute> {
-  double _left = 0.0;
+  String _msg = "";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('手势检测'),
+          title: Text('Notification'),
         ),
-        body: Stack(
-          children: <Widget>[
-            Positioned(
-              left: _left,
-              child: GestureDetector(
-                child: CircleAvatar(child: Text("A")),
-                //垂直方向拖动事件
-                onHorizontalDragUpdate: (DragUpdateDetails details) {
-                  setState(() {
-                    _left += details.delta.dx;
-                  });
-                },
-                onHorizontalDragEnd: (details){
-                  print('onHorizontalDragEnd');
-                },
-                onTapDown: (details){
-                    print('onTapDown');
-                },
-                onTapUp: (details){
-                  print('up');
-                },
-              ),
-            )
-          ],
+        body: NotificationListener<MyNotification>(
+          onNotification: (notification) {
+            setState(() {
+              _msg += notification.msg + "  ";
+            });
+          },
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+//          RaisedButton(
+//           onPressed: () => MyNotification("Hi").dispatch(context),
+//           child: Text("Send Notification"),
+//          ),
+                Builder(
+                  builder: (context) {
+                    return RaisedButton(
+                      //按钮点击时分发通知
+                      onPressed: () => MyNotification("Hi").dispatch(context),
+                      child: Text("Send Notification"),
+                    );
+                  },
+                ),
+                Text(_msg)
+              ],
+            ),
+          ),
         ));
   }
+}
+
+class MyNotification extends Notification {
+  MyNotification(this.msg);
+  final String msg;
 }
