@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 
 void main() => runApp(new MyApp());
 
@@ -11,48 +10,47 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primaryColor: Colors.blue,
       ),
-      home: Gestrue(),
+      home: BothDirectionTestRoute(),
     );
   }
 }
 
-class Gestrue extends StatefulWidget {
+class BothDirectionTestRoute extends StatefulWidget {
   @override
-  _GestrueState createState() => _GestrueState();
+  _BothDirectionTestRouteState createState() => _BothDirectionTestRouteState();
 }
 
-class _GestrueState extends State<Gestrue> {
-  TapGestureRecognizer _tapGestureRecognizer = TapGestureRecognizer();
-  bool _toggle = false;
-
-  @override
-  void dispose() {
-    _tapGestureRecognizer.dispose();
-    super.dispose();
-  }
+class _BothDirectionTestRouteState extends State<BothDirectionTestRoute> {
+  double _top = 0.0;
+  double _left = 0.0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('手势检测'),
-      ),
-      body: Center(
-        child: Text.rich(TextSpan(children: [
-          TextSpan(text: '你好世界'),
-          TextSpan(
-              text: '点我变色',
-              style: TextStyle(
-                  fontSize: 30.0, color: _toggle ? Colors.blue : Colors.red),
-              recognizer: _tapGestureRecognizer
-                ..onTap = () {
+        appBar: AppBar(
+          title: Text('手势检测'),
+        ),
+        body: Stack(
+          children: <Widget>[
+            Positioned(
+              top: _top,
+              left: _left,
+              child: GestureDetector(
+                child: CircleAvatar(child: Text("A")),
+                //垂直方向拖动事件
+                onVerticalDragUpdate: (DragUpdateDetails details) {
                   setState(() {
-                    _toggle = !_toggle;
+                    _top += details.delta.dy;
                   });
-                }),
-          TextSpan(text: '你好世界')
-        ])),
-      ),
-    );
+                },
+                onHorizontalDragUpdate: (DragUpdateDetails details) {
+                  setState(() {
+                    _left += details.delta.dx;
+                  });
+                },
+              ),
+            )
+          ],
+        ));
   }
 }
