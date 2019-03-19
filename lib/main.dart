@@ -10,20 +10,18 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primaryColor: Colors.blue,
       ),
-      home: DragVertical(),
+      home: ScaleImg(),
     );
   }
 }
 
-class DragVertical extends StatefulWidget {
+class ScaleImg extends StatefulWidget {
   @override
-  _DragVerticalState createState() =>
-      _DragVerticalState();
+  _ScaleImgState createState() => _ScaleImgState();
 }
 
-class _DragVerticalState extends State<DragVertical> {
-
-  double _top = 0.0;
+class _ScaleImgState extends State<ScaleImg> {
+  double _width = 200.0;
 
   @override
   Widget build(BuildContext context) {
@@ -31,31 +29,18 @@ class _DragVerticalState extends State<DragVertical> {
       appBar: AppBar(
         title: Text('手势检测'),
       ),
-      body: Stack(
-        children: <Widget>[
-          Positioned(
-            top: _top,
-            child: GestureDetector(
-              child:CircleAvatar(child: Text('A'),),
-              onPanDown: (DragDownDetails e){
-                print("用户手指按下：${e.globalPosition}");
-              },
-              onPanUpdate: (DragUpdateDetails e){
-                setState(() {
-                  setState(() {
-                   _top +=e.delta.dy; 
-                  });
-                });
-              },
-              onPanEnd: (DragEndDetails e){
-                print(e.velocity);
-              },
-            ),
-          )
-        ],
+      body: Center(
+        child: GestureDetector(
+          child: Image.network(
+              'http://easyread.ph.126.net/pg-5nIfYApOfzPab3hWobA==/7806611722048198046.jpg',
+              width: _width),
+          onScaleUpdate: ((ScaleUpdateDetails details) {
+            setState(() {
+              _width = 200 * details.scale.clamp(.8, 10.0);
+            });
+          }),
+        ),
       ),
     );
   }
-
-
 }
