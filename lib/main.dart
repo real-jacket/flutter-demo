@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 
 void main() => runApp(new MyApp());
 
@@ -10,18 +11,25 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primaryColor: Colors.blue,
       ),
-      home: ScaleImg(),
+      home: Gestrue(),
     );
   }
 }
 
-class ScaleImg extends StatefulWidget {
+class Gestrue extends StatefulWidget {
   @override
-  _ScaleImgState createState() => _ScaleImgState();
+  _GestrueState createState() => _GestrueState();
 }
 
-class _ScaleImgState extends State<ScaleImg> {
-  double _width = 200.0;
+class _GestrueState extends State<Gestrue> {
+  TapGestureRecognizer _tapGestureRecognizer = TapGestureRecognizer();
+  bool _toggle = false;
+
+  @override
+  void dispose() {
+    _tapGestureRecognizer.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,16 +38,20 @@ class _ScaleImgState extends State<ScaleImg> {
         title: Text('手势检测'),
       ),
       body: Center(
-        child: GestureDetector(
-          child: Image.network(
-              'http://easyread.ph.126.net/pg-5nIfYApOfzPab3hWobA==/7806611722048198046.jpg',
-              width: _width),
-          onScaleUpdate: ((ScaleUpdateDetails details) {
-            setState(() {
-              _width = 200 * details.scale.clamp(.8, 10.0);
-            });
-          }),
-        ),
+        child: Text.rich(TextSpan(children: [
+          TextSpan(text: '你好世界'),
+          TextSpan(
+              text: '点我变色',
+              style: TextStyle(
+                  fontSize: 30.0, color: _toggle ? Colors.blue : Colors.red),
+              recognizer: _tapGestureRecognizer
+                ..onTap = () {
+                  setState(() {
+                    _toggle = !_toggle;
+                  });
+                }),
+          TextSpan(text: '你好世界')
+        ])),
       ),
     );
   }
