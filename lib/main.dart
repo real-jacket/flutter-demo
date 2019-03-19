@@ -23,44 +23,30 @@ class ScrollNotificationTestRoute extends StatefulWidget {
 
 class _ScrollNotificationTestRouteState
     extends State<ScrollNotificationTestRoute> {
-  String _progress = '0%';
+  PointerEvent _event;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('滚动监听'),
+        title: Text('Pointer 事件处理'),
       ),
-      body: Scrollbar(
-        child: NotificationListener<ScrollNotification>(
-          onNotification: (ScrollNotification notification) {
-            double progress = notification.metrics.pixels /
-                notification.metrics.maxScrollExtent;
-            setState(() {
-              _progress = "${(progress * 100).toInt()}%";
-            });
-            print("Bottom:${notification.metrics.extentAfter == 0}");
-          },
-          child: Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              ListView.builder(
-                itemCount: 100,
-                itemExtent: 50,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text('$index'),
-                  );
-                },
-              ),
-              CircleAvatar(
-                radius: 30,
-                child: Text(_progress),
-                backgroundColor: Colors.black54,
-              )
-            ],
+      body: Listener(
+        child: Container(
+          alignment: Alignment.center,
+          color: Colors.blue,
+          width: 300,
+          height: 150,
+          child: Text(
+            _event?.toString() ?? '',
+            style: TextStyle(color: Colors.white),
           ),
         ),
+        onPointerDown: (PointerDownEvent event) =>
+            setState(() => _event = event),
+        onPointerMove: (PointerMoveEvent event) =>
+            setState(() => _event = event),
+        onPointerUp: (PointerUpEvent event) => setState(() => _event = event),
       ),
     );
   }
