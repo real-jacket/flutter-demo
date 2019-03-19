@@ -10,21 +10,20 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primaryColor: Colors.blue,
       ),
-      home: Drag(),
+      home: DragVertical(),
     );
   }
 }
 
-class Drag extends StatefulWidget {
+class DragVertical extends StatefulWidget {
   @override
-  _DragState createState() =>
-      _DragState();
+  _DragVerticalState createState() =>
+      _DragVerticalState();
 }
 
-class _DragState extends State<Drag> {
+class _DragVerticalState extends State<DragVertical> {
 
   double _top = 0.0;
-  double _left = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +35,6 @@ class _DragState extends State<Drag> {
         children: <Widget>[
           Positioned(
             top: _top,
-            left: _left,
             child: GestureDetector(
               child:CircleAvatar(child: Text('A'),),
               onPanDown: (DragDownDetails e){
@@ -45,7 +43,6 @@ class _DragState extends State<Drag> {
               onPanUpdate: (DragUpdateDetails e){
                 setState(() {
                   setState(() {
-                   _left +=e.delta.dx;
                    _top +=e.delta.dy; 
                   });
                 });
