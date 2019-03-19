@@ -10,64 +10,70 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primaryColor: Colors.blue,
       ),
-      home: CustomScrollViewTestRoute(),
+      home: ScrollControllerTestRoute(),
     );
   }
 }
 
-class CustomScrollViewTestRoute extends StatelessWidget {
+class ScrollControllerTestRoute extends StatefulWidget {
+  @override
+  _ScrollControllerTestRouteState createState() =>
+      _ScrollControllerTestRouteState();
+}
+
+class _ScrollControllerTestRouteState extends State<ScrollControllerTestRoute> {
+  ScrollController _controller = ScrollController();
+  bool showToButton = false;
+
+  @override
+  void initState() {
+    _controller.addListener(() {
+      print(_controller.position);
+      if (_controller.offset < 1000 && showToButton) {
+        setState(() {
+          showToButton = false;
+        });
+      } else if (_controller.offset >= 1000 && showToButton == false) {
+        setState(() {
+          showToButton = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 250,
-            flexibleSpace: FlexibleSpaceBar(
-              title: const Text('demo'),
-              background: Image.network(
-                'http://easyread.ph.126.net/pg-5nIfYApOfzPab3hWobA==/7806611722048198046.jpg',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.all(8.0),
-            sliver: SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 10.0,
-                crossAxisSpacing: 10.0,
-                childAspectRatio: 4.0,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  return Container(
-                    alignment: Alignment.center,
-                    color: Colors.cyan[100 * (index % 9)],
-                    child: Text('grid item $index'),
-                  );
-                },
-                childCount: 20,
-              ),
-            ),
-          ),
-          SliverFixedExtentList(
-            itemExtent: 50.0,
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return Container(
-                  alignment: Alignment.center,
-                  color: Colors.lightBlue[100 * (index % 9)],
-                  child: Text('list item $index'),
-                );
-              },
-              childCount: 50,
-            ),
-          )
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('滚动控制'),
       ),
+      body: Scrollbar(
+        child: ListView.builder(
+          itemCount: 100,
+          itemExtent: 50.0,
+          controller: _controller,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text('$index'),
+            );
+          },
+        ),
+      ),
+      floatingActionButton: !showToButton
+          ? null
+          : FloatingActionButton(
+              child: Icon(Icons.arrow_upward),
+              onPressed: () {
+                _controller.animateTo(.0,
+                    duration: Duration(microseconds: 200), curve: Curves.ease);
+              },
+            ),
     );
   }
 }
