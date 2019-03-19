@@ -10,19 +10,21 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primaryColor: Colors.blue,
       ),
-      home: GestureDetectorTestRoute(),
+      home: Drag(),
     );
   }
 }
 
-class GestureDetectorTestRoute extends StatefulWidget {
+class Drag extends StatefulWidget {
   @override
-  _GestureDetectorTestRouteState createState() =>
-      _GestureDetectorTestRouteState();
+  _DragState createState() =>
+      _DragState();
 }
 
-class _GestureDetectorTestRouteState extends State<GestureDetectorTestRoute> {
-  String _operation = "No Gestrue detected!";
+class _DragState extends State<Drag> {
+
+  double _top = 0.0;
+  double _left = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -30,29 +32,33 @@ class _GestureDetectorTestRouteState extends State<GestureDetectorTestRoute> {
       appBar: AppBar(
         title: Text('手势检测'),
       ),
-      body: Center(
-        child: GestureDetector(
-          child: Container(
-            alignment: Alignment.center,
-            color: Colors.blue,
-            width: 200.0,
-            height: 100.0,
-            child: Text(
-              _operation,
-              style: TextStyle(color: Colors.white),
+      body: Stack(
+        children: <Widget>[
+          Positioned(
+            top: _top,
+            left: _left,
+            child: GestureDetector(
+              child:CircleAvatar(child: Text('A'),),
+              onPanDown: (DragDownDetails e){
+                print("用户手指按下：${e.globalPosition}");
+              },
+              onPanUpdate: (DragUpdateDetails e){
+                setState(() {
+                  setState(() {
+                   _left +=e.delta.dx;
+                   _top +=e.delta.dy; 
+                  });
+                });
+              },
+              onPanEnd: (DragEndDetails e){
+                print(e.velocity);
+              },
             ),
-          ),
-          onTap: () => updateText("Tap"),
-          onDoubleTap: () => updateText('DoubleTap'),
-          onLongPress: () => updateText('LongPress'),
-        ),
+          )
+        ],
       ),
     );
   }
 
-  void updateText(String text) {
-    setState(() {
-      _operation = text;
-    });
-  }
+
 }
