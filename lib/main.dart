@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './camera_progressbar.dart';
 
 void main() => runApp(new MyApp());
 
@@ -10,57 +11,28 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primaryColor: Colors.blue,
       ),
-      home: BothDirectionTestRoute(),
+      home: FlexLayoutTestRoute(),
     );
   }
 }
 
-class BothDirectionTestRoute extends StatefulWidget {
-  @override
-  _BothDirectionTestRouteState createState() => _BothDirectionTestRouteState();
-}
+class FlexLayoutTestRoute extends StatelessWidget {
+  FlexLayoutTestRoute({Key key, this.percent, this.controller})
+      : super(key: key);
 
-class _BothDirectionTestRouteState extends State<BothDirectionTestRoute> {
-  String _msg = "";
-
+  final double percent;
+  final AnimationController controller;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Notification'),
-        ),
-        body: NotificationListener<MyNotification>(
-          onNotification: (notification) {
-            setState(() {
-              _msg += notification.msg + "  ";
-            });
-          },
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-//          RaisedButton(
-//           onPressed: () => MyNotification("Hi").dispatch(context),
-//           child: Text("Send Notification"),
-//          ),
-                Builder(
-                  builder: (context) {
-                    return RaisedButton(
-                      //按钮点击时分发通知
-                      onPressed: () => MyNotification("Hi").dispatch(context),
-                      child: Text("Send Notification"),
-                    );
-                  },
-                ),
-                Text(_msg)
-              ],
-            ),
-          ),
-        ));
+      appBar: new AppBar(
+        title: new Text("Circular Percent Indicators"),
+      ),
+      body: Center(
+          child: CameraBar(animationend: (){
+            print('动画结束');
+          },)),
+    );
   }
 }
 
-class MyNotification extends Notification {
-  MyNotification(this.msg);
-  final String msg;
-}
