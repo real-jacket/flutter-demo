@@ -28,11 +28,34 @@ class FlexLayoutTestRoute extends StatelessWidget {
       appBar: new AppBar(
         title: new Text("Circular Percent Indicators"),
       ),
-      body: Center(
-          child: CameraBar(animationend: (){
-            print('动画结束');
-          },)),
+      body: Center(child: WillPopScopeTestRoute()),
     );
   }
 }
 
+class WillPopScopeTestRoute extends StatefulWidget {
+  @override
+  WillPopScopeTestRouteState createState() => new WillPopScopeTestRouteState();
+}
+
+class WillPopScopeTestRouteState extends State<WillPopScopeTestRoute> {
+  DateTime _lastPressedAt;
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        if (_lastPressedAt == null ||
+            DateTime.now().difference(_lastPressedAt) > Duration(seconds: 1)) {
+          _lastPressedAt = DateTime.now();
+          return false;
+        }
+        return true;
+      },
+      child: Container(
+        alignment: Alignment.center,
+        child: Text('1s内连续两次返回键退出'),
+      ),
+    );
+  }
+}
