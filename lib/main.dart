@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:async';
+import 'package:path_provider/path_provider.dart';
 
 void main() => runApp(new MyApp());
 
@@ -10,7 +13,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primaryColor: Colors.blue,
       ),
-      home: ThemeTestRoute(),
+      home: FileOperationRoute(),
     );
   }
 }
@@ -27,65 +30,67 @@ class MyApp extends StatelessWidget {
 //       appBar: new AppBar(
 //         title: new Text("Circular Percent Indicators"),
 //       ),
-//       body: Center(child: InheritedWidgetTestRoute()),
+//       body: Center(child: Container()),
 //     );
 //   }
 // }
 
-class ThemeTestRoute extends StatefulWidget {
+class FileOperationRoute extends StatefulWidget {
+  FileOperationRoute({Key key}) : super(key: key);
+
   @override
-  _ThemeTestRouteState createState() => new _ThemeTestRouteState();
+  _FileOperationRouteState createState() => _FileOperationRouteState();
 }
 
-class _ThemeTestRouteState extends State<ThemeTestRoute> {
-  Color _themeColor = Colors.teal; // 当前路由主题色
+class _FileOperationRouteState extends State<FileOperationRoute> {
+  int _counter;
 
   @override
-  Widget build(BuildContext context) {
-    ThemeData themeData = Theme.of(context);
-    return Theme(
-      data: ThemeData(
-          primarySwatch: _themeColor, //用于导航栏、FloatingAction的背景色等
-          iconTheme: IconThemeData(color: _themeColor) //用于Icon颜色
-          ),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('主题测试'),
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Icon(Icons.favorite),
-                Icon(Icons.airport_shuttle),
-                Text('颜色跟随主题')
-              ],
-            ),
-            Theme(
-              data: themeData.copyWith(
-                  iconTheme: themeData.iconTheme.copyWith(color: Colors.black)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(Icons.favorite),
-                  Icon(Icons.airport_shuttle),
-                  Text('颜色固定黑色')
-                ],
-              ),
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => {
-                setState(() => {
-                      _themeColor =
-                          _themeColor == Colors.teal ? Colors.blue : Colors.teal
-                    })
-              },
-          child: Icon(Icons.palette),
-        ),
+  void initState() {
+    super.initState();
+    _readCounter().then((int value) {
+      setState(() {
+        _counter = value;
+      });
+    });
+  }
+
+  Future<File> _getLocalFile() async {
+    String dir = (await getApplicationDocumentsDirectory()).path;
+    print(dir);
+    return File('$dir/counter.txt');
+  }
+
+  Future<int> _readCounter() async {
+    try {
+      File file = await _getLocalFile();
+      String contents = await file.readAsString();
+      return int.parse(contents);
+    } on FileSystemException {
+      return 0;
+    }
+  }
+
+  Future<Null> _incrementCounter() async {
+    setState(() {
+      _counter++;
+    });
+    await (await _getLocalFile()).writeAsString('$_counter');
+  }
+
+  @override
+  Widget build(BuildContext contetx) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('文件操作'),
+      ),
+      body: Center(
+        child: Text('点击了 $_counter 次'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
       ),
     );
   }
