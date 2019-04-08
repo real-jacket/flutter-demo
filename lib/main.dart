@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'dart:async';
-import 'package:path_provider/path_provider.dart';
+import 'package:web_socket_channel/io.dart';
 
 void main() => runApp(new MyApp());
 
@@ -13,7 +11,7 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primaryColor: Colors.blue,
       ),
-      home: FileOperationRoute(),
+      home: WebSocketRoute(),
     );
   }
 }
@@ -35,63 +33,72 @@ class MyApp extends StatelessWidget {
 //   }
 // }
 
-class FileOperationRoute extends StatefulWidget {
-  FileOperationRoute({Key key}) : super(key: key);
-
+class WebSocketRoute extends StatefulWidget {
   @override
-  _FileOperationRouteState createState() => _FileOperationRouteState();
+  _WebSocketRouteState createState() => _WebSocketRouteState();
 }
 
-class _FileOperationRouteState extends State<FileOperationRoute> {
-  int _counter;
+class _WebSocketRouteState extends State<WebSocketRoute> {
+  TextEditingController _controller = TextEditingController();
+  IOWebSocketChannel channel;
+  String _text = "";
 
   @override
   void initState() {
-    super.initState();
-    _readCounter().then((int value) {
-      setState(() {
-        _counter = value;
-      });
-    });
-  }
-
-  Future<File> _getLocalFile() async {
-    String dir = (await getApplicationDocumentsDirectory()).path;
-    print(dir);
-    return File('$dir/counter.txt');
-  }
-
-  Future<int> _readCounter() async {
-    try {
-      File file = await _getLocalFile();
-      String contents = await file.readAsString();
-      return int.parse(contents);
-    } on FileSystemException {
-      return 0;
-    }
-  }
-
-  Future<Null> _incrementCounter() async {
-    setState(() {
-      _counter++;
-    });
-    await (await _getLocalFile()).writeAsString('$_counter');
+    channel = IOWebSocketChannel.connect('ws://echo.websocket.org');
   }
 
   @override
-  Widget build(BuildContext contetx) {
-    return Scaffold(
+  Widget build(BuildContext context) {
+    return new Scaffold(
       appBar: AppBar(
-        title: Text('文件操作'),
+        title: Text('websocket(内容回显)'),
       ),
-      body: Center(
-        child: Text('点击了 $_counter 次'),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Form(
+              child: TextFormField(
+                controller: _controller,
+                decoration: InputDecoration(labelText: 'Send a message'),
+              ),
+            ),
+            StreamBuilder(
+              stream: channel.stream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  _text = '网络不通';
+                } else if (snapshot.hasData) {
+                  _text = "echo: " + snapshot.data;
+                }
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0),
+                  child: Text(_text),
+                );
+              },
+            )
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+        onPressed: _sendMessage,
+        tooltip: 'Send message',
+        child: Icon(Icons.send),
       ),
     );
+  }
+
+  void _sendMessage() {
+    if (_controller.text.isNotEmpty) {
+      channel.sink.add(_controller.text);
+    }
+  }
+
+  @override
+  void dispose() {
+    channel.sink.close();
+    super.dispose();
   }
 }
