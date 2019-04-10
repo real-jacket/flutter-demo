@@ -1,49 +1,50 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(new MyApp());
+void main() {
+  runApp(new MyApp(
+    items: new List<String>.generate(20, (i) => "Item ${i + 1}"),
+  ));
+}
 
 class MyApp extends StatelessWidget {
+  final List<String> items;
+
+  MyApp({Key key, @required this.items}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final title = 'InkWell Demo';
+    final title = 'Dismissing Items';
 
     return new MaterialApp(
       title: title,
-      home: new MyHomePage(title: title),
-    );
-  }
-}
+      home: new Scaffold(
+        appBar: new AppBar(
+          title: new Text(title),
+        ),
+        body: new ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
 
-class MyHomePage extends StatelessWidget {
-  final String title;
+            return new Dismissible(
+              // Each Dismissible must contain a Key. Keys allow Flutter to
+              // uniquely identify Widgets.
+              key: new Key(item),
+              // We also need to provide a function that will tell our app
+              // what to do after an item has been swiped away.
+              onDismissed: (direction) {
+                items.removeAt(index);
 
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(title),
-      ),
-      body: new Center(child: new MyButton()),
-    );
-  }
-}
-
-class MyButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    // The InkWell Wraps our custom flat button Widget
-    return new InkWell(
-      // When the user taps the button, show a snackbar
-      onTap: () {
-        Scaffold.of(context).showSnackBar(new SnackBar(
-          content: new Text('Tap'),
-        ));
-      },
-      child: new Container(
-        padding: new EdgeInsets.all(12.0),
-        child: new Text('Flat Button'),
+                Scaffold.of(context).showSnackBar(
+                    new SnackBar(content: new Text("$item dismissed")));
+              },
+              // Show a red background as the item is swiped away
+              background: new Container(color: Colors.red),
+              child: new ListTile(title: new Text('$item')),
+            );
+          },
+        ),
       ),
     );
   }
