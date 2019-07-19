@@ -48,7 +48,7 @@ class _CameraBarState extends State<CameraBar>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onLongPressDragStart: (e) {
+        onLongPressStart: (e) {
           if (active) {
             controller.forward();
           } else {
@@ -61,7 +61,7 @@ class _CameraBarState extends State<CameraBar>
         //   active = false;
         //   widget.animationend();
         // },
-        onLongPressDragUp: (e){
+        onLongPressUp: (){
           controller.stop();
           active = false;
           widget.animationend();
