@@ -27,6 +27,7 @@ dependencies:
   transparent_image: ^1.0.0
   cached_network_image: ^0.7.0
   bubble_tab_indicator: "^0.1.4"
+  rubber: ^0.3.2
 
 
 dev_dependencies:
