@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import './filter_ui.dart';
-import './bottom_drawer.dart';
+import './bottom_drawer/bottom_drawer.dart';
 
 void main() => runApp(MyApp());
 
